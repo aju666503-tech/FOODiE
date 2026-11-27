@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#C8101E"><meta name="csrf-token" content="{{ csrf_token }}"><meta name="description" content="FOODíE — Good Food. Greater Mood.">
+  <link rel="manifest" href="{{ url_for('static',filename='manifest.json') }}?v=20261127-4">
+  <link rel="apple-touch-icon" href="{{ url_for('static',filename='icons/apple-touch-icon.png') }}?v=20261127-4">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}?v=20261127-4">
+  <title>{% block title %}FOODíE{% endblock %}</title>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">♨</span><span>FOOD<span class="brand-accent">íE</span><small>GOOD FOOD. GREATER MOOD.</small></span></a>
+    <nav class="side-nav" aria-label="Main navigation">
+      {% if current_user and current_user.role=='staff' %}
+      <a class="side-link selected" href="{{ url_for('staff') }}"><span>▣</span>Work Dashboard</a>
+      {% else %}
+      <a class="side-link {{ 'selected' if request.endpoint=='home' else '' }}" href="{{ url_for('home') }}"><span>⌂</span>Home</a>
+      <a class="side-link" href="{{ url_for('home') }}#menu"><span>♜</span>Menu</a>
+      {% if current_user %}<a class="side-link {{ 'selected' if request.endpoint=='history' or request.endpoint=='order_detail' else '' }}" href="{{ url_for('history') }}"><span>▤</span>My Orders</a><a class="side-link {{ 'selected' if request.endpoint=='account' else '' }}" href="{{ url_for('account') }}"><span>⚙</span>Settings</a>{% if current_user.role=='admin' %}<a class="side-link {{ 'selected' if request.endpoint=='admin' else '' }}" href="{{ url_for('admin') }}"><span>▦</span>Admin</a>{% endif %}{% else %}<a class="side-link" href="{{ url_for('login') }}"><span>↪</span>Sign in</a>{% endif %}
+      {% endif %}
+    </nav>
+    {% if not current_user or current_user.role!='staff' %}<div class="sidebar-promo"><span class="promo-spark">✦</span><h3>Delicious Meals,<br>Delivered with <b>FOODíE!</b></h3><div class="promo-food"><img src="{{ url_for('static',filename='images/products/1.webp') }}" alt="FOODíE featured chicken meal"></div><small>Good Food. Greater Mood.</small></div>
+    {% endif %}<div class="sidebar-foot">© 2026 FOODíE</div>
+  </aside>
+  <div class="main-shell">
+    <header class="topbar">
+      {% if not current_user or current_user.role!='staff' %}<form class="top-search" method="get" action="{{ url_for('home') }}"><span>⌕</span><input name="q" placeholder="Search for your favorite food..." value="{{ request.args.get('q','') }}" aria-label="Search food"><button type="submit">Search</button></form>{% else %}<div class="top-search staff-top-label">STAFF WORKSPACE · CUSTOMER ORDER OPERATIONS</div>{% endif %}
+      <div class="top-actions">{% if current_user %}<a class="account-link" href="{{ url_for('notification_center') }}">🔔{% if notification_count %}<b>{{ notification_count }}</b>{% endif %}<span>Notifications</span></a>{% endif %}{% if not current_user or current_user.role!='staff' %}<a class="cart-link" href="{{ url_for('cart') }}" aria-label="Shopping cart">🛒 <b>{{ cart_count }}</b></a>{% endif %}{% if current_user %}{% if current_user.role!='staff' %}<a class="account-link" href="{{ url_for('account') }}"><span class="account-avatar">{{ current_user.name[:1]|upper }}</span><span>My Account</span></a>{% endif %}<form method="post" action="{{ url_for('logout') }}" class="inline"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="link-button">Sign out</button></form>{% else %}<a class="account-link" href="{{ url_for('login') }}"><span class="account-avatar">♙</span><span>My Account</span></a>{% endif %}</div>
+    </header>
+    <main class="page">
+      {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="notices">{% for category,message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer><div class="footer-brand">FOOD<span>íE</span></div><p>Good Food. Greater Mood.</p><small>© 2026 FOODíE · Demo ordering platform · <a href="{{ url_for('privacy_policy') }}">Privacy</a> · <a href="{{ url_for('terms_conditions') }}">Terms</a></small></footer>
+  </div>
+</div>
+<script src="{{ url_for('static',filename='js/app.js') }}?v=20261127-4" defer></script>
+</body></html>

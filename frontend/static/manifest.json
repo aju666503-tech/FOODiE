@@ -1,0 +1,23 @@
+{
+  "name": "FOODíE — Good Food. Greater Mood.",
+  "short_name": "FOODíE",
+  "description": "Order your favorite meals through the FOODíE web application.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF9F0",
+  "theme_color": "#C8101E",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

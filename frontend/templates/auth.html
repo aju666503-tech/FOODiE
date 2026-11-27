@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}{{ {'login':'Sign in','register':'Create account','setup':'First administrator setup'}[mode] }} · FOODíE{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-aside"><span class="eyebrow">WELCOME TO FOODíE</span><h1>Everyday dining,<br><em>elevated.</em></h1><p>Find your next favorite bite and make every meal a little moment.</p><div class="auth-doodle">🍜　🥢　🍓</div></div>
+  <div class="auth-card">
+    <span class="eyebrow red">{{ 'ONE-TIME SETUP' if mode=='setup' else 'YOUR FOODíE ACCOUNT' }}</span>
+    <h2>{{ {'login':'Welcome back','register':'Create your account','setup':'Set up your administrator'}[mode] }}</h2>
+    <p class="muted">{{ {'login':'Sign in to continue your delicious journey.','register':'A few details and a quick policy review, then you can create your account.','setup':'Create the first administrator. This page closes after setup.'}[mode] }}</p>
+    <form method="post" class="stack-form" id="account-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if mode!='login' %}<label>Full name<input name="name" required minlength="2" autocomplete="name"></label>{% endif %}
+      <label>Email address<input name="email" type="email" required autocomplete="email"></label>
+      <label>Password<input name="password" type="password" required minlength="10" autocomplete="{{ 'new-password' if mode!='login' else 'current-password' }}">{% if mode!='login' %}<small>At least 10 characters, with uppercase, lowercase and a number.</small>{% endif %}</label>
+      {% if mode!='login' %}<label>Confirm password<input name="confirm" type="password" required minlength="10" autocomplete="new-password"></label>{% endif %}
+      {% if mode=='register' %}
+      <div class="policy-consent policy-consent-modern">
+        <div class="policy-consent-heading"><b>Before creating your account</b><small>Open each document, review it to the end, then confirm your acknowledgement.</small></div>
+        <label class="choice policy-choice"><input id="privacy-accepted" type="checkbox" name="privacy_accepted" required disabled><span><b>Privacy Policy</b><small id="privacy-review-state">Not reviewed yet · <a href="{{ url_for('privacy_policy') }}" target="_blank">Open and review</a></small></span></label>
+        <label class="choice policy-choice"><input id="terms-accepted" type="checkbox" name="terms_accepted" required disabled><span><b>Terms &amp; Conditions</b><small id="terms-review-state">Not reviewed yet · <a href="{{ url_for('terms_conditions') }}" target="_blank">Open and review</a></small></span></label>
+        <small>Policy version {{ policy_version }}. The acknowledgement boxes become available after each document has been reviewed to the end.</small>
+      </div>
+      {% endif %}
+      <button class="button primary full">{{ {'login':'Sign in','register':'Create account','setup':'Create administrator'}[mode] }}</button>
+    </form>
+    {% if mode=='login' and admin_setup_available %}<p class="auth-switch"><a href="{{ url_for('setup_admin') }}">Set up the first administrator</a></p>{% endif %}
+    {% if mode=='login' %}<p class="auth-switch">New to FOODíE? <a href="{{ url_for('register') }}">Create an account</a></p>{% elif mode=='register' %}<p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>{% endif %}
+  </div>
+</section>
+{% if mode=='register' %}<script src="{{ url_for('static',filename='js/policy-consent.js') }}" defer></script>{% endif %}
+{% endblock %}

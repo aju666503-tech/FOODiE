@@ -1,0 +1,33 @@
+{% extends 'base.html' %}{% block title %}Receipt {{ order.order_number }} · FOODíE{% endblock %}{% block content %}
+<section class="panel receipt-panel" id="receipt">
+  <div class="receipt-brand"><span class="eyebrow red">FOODíE</span><h1>Digital Order Receipt</h1><span class="status status-completed">{{ "CASH PAYMENT CONFIRMED" if order.payment_channel.startswith("Cash on") else "PAYMENT CONFIRMED" }}</span><p class="muted">Thank you for ordering with FOODíE!</p></div>
+  <div class="summary-line"><span>Order number</span><b>{{ order.order_number }}</b></div>
+  <div class="summary-line"><span>Date</span><b>{{ order.created_at }}</b></div>
+  <div class="summary-line"><span>Customer</span><b>{{ order.customer_name }}</b></div>
+  <div class="summary-line"><span>Payment method</span><b>{{ order.payment_channel }}</b></div>
+  <div class="summary-line"><span>Payment status</span><b>{{ order.payment_status }}</b></div>
+  <div class="summary-line"><span>Payment reference</span><b>{{ order.payment_reference or 'Not available' }}</b></div>
+  <h3>Order summary</h3>
+  <div class="receipt-items">
+    <div class="receipt-item receipt-item-head"><span>QTY</span><span>FOOD NAME</span><span>PRICE</span></div>
+    {% for item in order['active_items'] %}
+    <div class="receipt-item"><span>{{ item.quantity }}</span><span class="receipt-food-name">{{ item.name }}</span><b>₱{{ '%.2f'|format(item.price*item.quantity) }}</b></div>
+    {% endfor %}
+  </div>
+  <div class="summary-total"><span>TOTAL PAID</span><b>₱{{ '%.2f'|format(order.original_total or order.total) }}</b></div>
+  {% if order.refunds_processed %}<div class="summary-line"><span>Refunds recorded as processed</span><b>− ₱{{ '%.2f'|format(order.refunds_processed) }}</b></div><div class="summary-total"><span>Net after processed refunds</span><b>₱{{ '%.2f'|format((order.original_total or order.total)-order.refunds_processed) }}</b></div>{% endif %}
+  {% if order.refunds_pending %}<p class="muted">Refund review pending: ₱{{ '%.2f'|format(order.refunds_pending) }}. This is not a completed transfer.</p>{% endif %}
+  {% if order.payment_status == 'PAID (DEMO)' or order.payment_channel.startswith('GCash') or order.payment_channel.startswith('Maya') or order.payment_channel.startswith('QR') %}<p class="demo-disclaimer">Demo Payment Only — No Real Money Will Be Charged.</p>{% endif %}
+  <div class="receipt-actions no-print"><button class="button primary" onclick="window.print()" type="button">Print / Save as PDF</button><a class="button secondary" href="{{ url_for('home') }}">Return to menu</a><a class="text-action" href="{{ url_for('history') }}">Order history</a></div>
+</section>
+<style>
+.receipt-items{width:100%;border:1px solid #eadfd6;border-radius:12px;overflow:hidden;margin:12px 0 20px}
+.receipt-item{display:grid;grid-template-columns:64px minmax(0,1fr) 112px;gap:14px;align-items:center;padding:13px 16px;border-bottom:1px solid #eee5dc;line-height:1.45}
+.receipt-item:last-child{border-bottom:0}
+.receipt-item-head{background:#fff7ef;color:#7b4a43;font-size:.76rem;font-weight:800;letter-spacing:.06em}
+.receipt-food-name{overflow-wrap:anywhere}
+.receipt-item b{text-align:right;white-space:nowrap}
+.receipt-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px}
+@media(max-width:520px){.receipt-item{grid-template-columns:42px minmax(0,1fr) 88px;gap:8px;padding:11px 10px;font-size:.9rem}}
+@media print{header,nav,.no-print,footer{display:none!important}body{background:#fff!important}.receipt-panel{box-shadow:none!important;border:0!important;max-width:760px;margin:auto}}</style>
+{% endblock %}

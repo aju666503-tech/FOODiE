@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Review policies · FOODíE{% endblock %}
+{% block content %}
+<section class="policy-gate panel">
+  <div class="policy-gate-icon">✓</div><span class="eyebrow red">ACCOUNT NOTICE · VERSION {{ policy_version }}</span>
+  <h1>Please review our updated policies</h1>
+  <p class="muted">Your account needs to acknowledge the current Privacy Policy and Terms &amp; Conditions before you can continue using customer features.</p>
+  <form method="post" class="stack-form" id="account-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="choice policy-choice"><input id="privacy-accepted" type="checkbox" name="privacy_accepted" required disabled><span><b>Privacy Policy</b><small id="privacy-review-state">Not reviewed yet · <a href="{{ url_for('privacy_policy') }}" target="_blank">Open and review</a></small></span></label>
+    <label class="choice policy-choice"><input id="terms-accepted" type="checkbox" name="terms_accepted" required disabled><span><b>Terms &amp; Conditions</b><small id="terms-review-state">Not reviewed yet · <a href="{{ url_for('terms_conditions') }}" target="_blank">Open and review</a></small></span></label>
+    <button class="button primary full">Continue to FOODíE</button>
+  </form>
+</section>
+<script src="{{ url_for('static',filename='js/policy-consent.js') }}" defer></script>
+{% endblock %}
